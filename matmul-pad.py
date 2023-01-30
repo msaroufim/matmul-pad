@@ -28,7 +28,7 @@ def matmul_test(size1, size2, dtype=torch.int8, pad=False):
     tensor2.to(dtype)
 
     tic = time.time()
-    result = torch.matmul(tensor1, tensor2)
+    result = torch.mm(tensor1, tensor2)
     torch.cuda.synchronize()
     toc = time.time()
     return toc - tic
@@ -43,8 +43,8 @@ def write_to_csv(file, data):
 def run_tests(sizes, pad=False):
     durations = []
     data = []
-    for size1 in sizes:
-        for size2 in sizes:
+    for size1 in tqdm(sizes):
+        for size2 in tqdm(sizes):
             duration = matmul_test(size1, size2, pad)
             durations.append(duration)
             data.append([str(size1), str(size2), str(duration), str(pad)])
