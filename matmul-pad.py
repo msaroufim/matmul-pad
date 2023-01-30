@@ -8,22 +8,24 @@ from tqdm import tqdm
 torch.set_float32_matmul_precision('high')
 cuda = torch.device('cuda')
 
+dtype_to_alignment_map = {torch.int8 : 16, torch.float16 : 8, torch.float32 : 4, torch.float64 : 2}
+
 def largest_closest_multiple(n, k=16):
     if n % k == 0:
         return n
     else:
         return n + k - (n % k)
 
-def matmul_test(size1, size2, pad=False):
+def matmul_test(size1, size2, dtype=torch.int8, pad=False):
     if pad:
-        size1 = largest_closest_multiple(size1)
-        size2 = largest_closest_multiple(size2)
+        size1 = largest_closest_multiple(size1, dtype_to_alignment_map[dtype])
+        size2 = largest_closest_multiple(size2, dtype_to_alignment_map[dtype])
     
     tensor1 = torch.randn(size1,size2, device=cuda)
     tensor2 = torch.randn(size2, size1, device=cuda)
 
-    tensor1.to(torch.int8)
-    tensor2.to(torch.int8)
+    tensor1.to(dtype)
+    tensor2.to(dtype)
 
     tic = time.time()
     result = torch.matmul(tensor1, tensor2)
