@@ -7,6 +7,8 @@ from tqdm import tqdm
 # Enable tensor cores
 torch.set_float32_matmul_precision('high')
 cuda = torch.device('cuda')
+import datetime
+date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 dtype_to_alignment_map = {torch.int8 : 16, torch.float16 : 8, torch.float32 : 4, torch.float64 : 2}
 
@@ -58,14 +60,14 @@ def plot_results(durations_no_pad, durations_pad):
     plt.legend()
 
     plt.show()
-    plt.savefig('matmul-pad-nopad-big.png')
+    plt.savefig(date)
 
 def main():
-    sizes = range(10000, 20000, 1000)
+    sizes = range(10000, 11000, 1)
     durations_no_pad, data_no_pad = run_tests(sizes, False)
     durations_pad, data_pad = run_tests(sizes, True)
 
-    with open('output', 'w') as f:
+    with open(date, 'w') as f:
         write_to_csv(f, data_no_pad + data_pad)
 
     plot_results(durations_no_pad, durations_pad)
